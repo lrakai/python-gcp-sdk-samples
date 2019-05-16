@@ -1,4 +1,5 @@
 import json
+import time
 
 from config import EVENT_CONFIG
 
@@ -6,24 +7,16 @@ from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 
 def handler(event, context):
-    credentials, subscription_id = get_credentials(event)
-    service = build('compute', 'v1', credentials)
-        
-    return False
-
-def get_service(credential_id, credential_key, scopes, api_name='compute', api_version='v1'):
-    service_account_info = json.loads(credential_key)
-    credentials = Credentials.from_service_account_info(service_account_info)
-    #admin_credentials = credentials.create_delegated(credential_id)
+    credentials = get_credentials(event)
+    service = build('compute', 'v1', credentials=credentials)
+    result = service.instances().list(project=credentials.project_id, zone='us-central1-a').execute()
+    return True if 'items' in result else False
 
 def get_credentials(event):
-    subscription_id = event['environment_params']['subscription_id']
-    credentials = ServicePrincipalCredentials(
-        client_id=event['credentials']['credential_id'],
-        secret=event['credentials']['credential_key'],
-        tenant=event['environment_params']['tenant']
-    )
-    return credentials, subscription_id
+    service_account_info = json.loads(event['credentials']['credential_key'])
+    credentials = Credentials.from_service_account_info(service_account_info)
+    credentials = credentials.with_scopes(['https://www.googleapis.com/auth/cloud-platform'])
+    return credentials
 
 def timed_handler(event, context):
     start = time.time()
