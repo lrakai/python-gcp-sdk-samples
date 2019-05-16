@@ -1,10 +1,8 @@
-import json
-import time
-
 from config import EVENT_CONFIG
+from credentials import credential_helper
+from timed_handler import timed_handler
 
 from googleapiclient.discovery import build
-from credentials import credential_helper
 
 def handler(event, context):
     credentials = credential_helper.get_credentials(event)
@@ -12,16 +10,6 @@ def handler(event, context):
     result = service.instances().list(project=credentials.project_id, zone='us-central1-a').execute()
     return True if 'items' in result else False
 
-def timed_handler(event, context):
-    start = time.time()
-
-    result = handler(event, context)
-
-    end = time.time()
-    print(end - start)
-
-    return result
-
 if __name__ == "__main__":
-    result = timed_handler(EVENT_CONFIG, None)
+    result = timed_handler.time_handler(handler, EVENT_CONFIG, None)
     print(result)
