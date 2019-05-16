@@ -1,4 +1,4 @@
 virtualenv venv
 .\venv\Scripts\activate
-pip install google-api-python-client
+pip install google-api-python-client pylint autopep8
 . .\secrets.ps1
