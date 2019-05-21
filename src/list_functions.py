@@ -6,8 +6,10 @@ from googleapiclient.discovery import build
 
 def handler(event, context):
     credentials = credential_helper.get_credentials(event)
+    project_id = event['environment_params']['project_id']
+
     service = build('cloudfunctions', 'v1', credentials=credentials)
-    result = service.projects().locations().functions().list(parent='projects/'+credentials.project_id+'/locations/-').execute()
+    result = service.projects().locations().functions().list(parent='projects/'+project_id+'/locations/-').execute()
     return True if 'functions' in result and len(result['functions']) >= 1 else False
 
 if __name__ == "__main__":
