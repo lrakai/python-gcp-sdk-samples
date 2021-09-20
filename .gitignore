@@ -4,3 +4,4 @@ __pycache__
 secrets.ps1
 scratch*
 **.pyc
+requirements.txt
